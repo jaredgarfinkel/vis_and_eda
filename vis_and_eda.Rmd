@@ -1,0 +1,13 @@
+---
+title: "viz_and_eda"
+author: "Jared Garfinkel"
+date: "9/26/2019"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(ggridges)
+```
