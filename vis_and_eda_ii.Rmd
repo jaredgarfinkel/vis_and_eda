@@ -10,7 +10,6 @@ knitr::opts_chunk$set(echo = TRUE)
 
 library(ggridges)
 library(tidyverse)
-
 ```
 
 ```{r load_data, cache=TRUE}
@@ -114,5 +113,76 @@ where do my warnings come from
 ```{r}
 weather_df %>% 
   filter(is.na(tmin))
+```
+
+more fun with ggplot
+
+```{r}
+central_park = 
+  weather_df %>% 
+  filter(name == "CentralPark_NY")
+
+waikiki =
+  weather_df %>% 
+  filter(name == "Waikiki_HA")
+
+ggplot(data = waikiki, aes(x = date, y = tmax, color = name)) +
+  geom_point(aes(size = prcp)) +
+  geom_line(data = central_park)
+```
+
+brief aside about colors
+
+```{r}
+waikiki %>% 
+  ggplot(aes(x = date, y = tmax)) +
+  geom_point(alpha = .5, color = "blue")
+```
+
+## Multi-panel plots
+
+```{r}
+ggp_scatter = 
+  weather_df %>% 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_point()
+
+ggp_density = 
+  weather_df %>% 
+  ggplot(aes(x = tmin)) +
+  geom_density()
+
+ggp_box = 
+  weather_df %>% 
+  ggplot(aes(x = name, y = tmax, color = name)) +
+  geom_boxplot()
+
+# CRAN patchwork
+# ggp_scatter + ggp_density / ggp_box
+```
+
+```{r}
+  weather_df %>% 
+  mutate(
+    name = factor(name),
+    name = fct_relevel(name, "Waikiki_HA", "CentralPark_NY")
+  ) %>% 
+  ggplot(aes(x = name, y = tmax, color = name)) +
+  geom_boxplot()
+```
+
+## restructure then plot
+
+```{r}
+weather_df %>% 
+  pivot_longer(
+    tmax:tmin,
+    names_to = "observation",
+    values_to = "temperature"
+  ) %>% 
+  ggplot(aes(x = temperature, fill = observation)) +
+  geom_density(alpha = .5) +
+  facet_grid(~name) +
+  theme(legend.position = "bottom")
 ```
 
