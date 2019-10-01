@@ -175,3 +175,90 @@ weather_df %>%
     ## 13 Waikiki_HA USC00519397 2017-10-21     0  30      NA
     ## 14 Waikiki_HA USC00519397 2017-10-22     0  30      NA
     ## 15 Waikiki_HA USC00519397 2017-12-22     0  26.7    NA
+
+more fun with ggplot
+
+``` r
+central_park = 
+  weather_df %>% 
+  filter(name == "CentralPark_NY")
+
+waikiki =
+  weather_df %>% 
+  filter(name == "Waikiki_HA")
+
+ggplot(data = waikiki, aes(x = date, y = tmax, color = name)) +
+  geom_point(aes(size = prcp)) +
+  geom_line(data = central_park)
+```
+
+    ## Warning: Removed 3 rows containing missing values (geom_point).
+
+![](vis_and_eda_ii_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+brief aside about colors
+
+``` r
+waikiki %>% 
+  ggplot(aes(x = date, y = tmax)) +
+  geom_point(alpha = .5, color = "blue")
+```
+
+    ## Warning: Removed 3 rows containing missing values (geom_point).
+
+![](vis_and_eda_ii_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+## Multi-panel plots
+
+``` r
+ggp_scatter = 
+  weather_df %>% 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_point()
+
+ggp_density = 
+  weather_df %>% 
+  ggplot(aes(x = tmin)) +
+  geom_density()
+
+ggp_box = 
+  weather_df %>% 
+  ggplot(aes(x = name, y = tmax, color = name)) +
+  geom_boxplot()
+
+# CRAN patchwork
+# ggp_scatter + ggp_density / ggp_box
+```
+
+``` r
+  weather_df %>% 
+  mutate(
+    name = factor(name),
+    name = fct_relevel(name, "Waikiki_HA", "CentralPark_NY")
+  ) %>% 
+  ggplot(aes(x = name, y = tmax, color = name)) +
+  geom_boxplot()
+```
+
+    ## Warning: Removed 3 rows containing non-finite values (stat_boxplot).
+
+![](vis_and_eda_ii_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+## restructure then plot
+
+``` r
+weather_df %>% 
+  pivot_longer(
+    tmax:tmin,
+    names_to = "observation",
+    values_to = "temperature"
+  ) %>% 
+  ggplot(aes(x = temperature, fill = observation)) +
+  geom_density(alpha = .5) +
+  facet_grid(~name) +
+  theme(legend.position = "bottom")
+```
+
+    ## Warning: Removed 18 rows containing non-finite values (stat_density).
+
+![](vis_and_eda_ii_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
